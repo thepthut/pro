@@ -11,5 +11,3 @@ def index():
 if __name__ == '__main__':
        print("Template folder:", template_dir)
        app.run(debug=True)
-       a5sd5ad
-       
