@@ -3,17 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายการอาหาร</title>
+    <title>จัดการเมนูอาหาร</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style1.css') }}">
 </head>
 <body>
     <div class="head_Top">
         <img src="{{ url_for('static', filename='ครุศาสตร์-600x400.png') }}" alt="โลโก้" class="img1">
         <a href="{{ url_for('index') }}" class="Menu home">หน้าหลัก</a>
-        <a href="{{ url_for('menu') }}" class="Menu food">เมนูร้าน</a>
+        <a href="{{ url_for('menu') }}" class="Menu food">จัดการเมนูอาหาร</a>
         <a href="{{ url_for('total_summary') }}" class="Menu Total">สรุป</a>
     </div>
 
-    
+    <div class="menu-container">
+        <h2>รายการเมนูอาหาร</h2>
+        <button id="add-menu-btn" class="add-menu-btn">เพิ่มเมนูใหม่</button>
+        
+        <div id="menu-list">
+            <!-- รายการเมนูอาหารจะถูกเพิ่มที่นี่ด้วย TypeScript -->
+        </div>
+    </div>
+
+    <!-- Modal สำหรับฟอร์มเพิ่มเมนู -->
+    <div id="add-menu-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>เพิ่มเมนูอาหารใหม่</h3>
+            <form id="add-menu-form">
+                <div class="form-group">
+                    <label for="menu-name">ชื่อเมนู:</label>
+                    <input type="text" id="menu-name" name="menu-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="menu-price">ราคา (บาท):</label>
+                    <input type="number" id="menu-price" name="menu-price" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="menu-description">คำอธิบาย:</label>
+                    <textarea id="menu-description" name="menu-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="menu-category">หมวดหมู่:</label>
+                    <select id="menu-category" name="menu-category">
+                        <option value="main">อาหารจานหลัก</option>
+                        <option value="appetizer">อาหารเรียกน้ำย่อย</option>
+                        <option value="dessert">ของหวาน</option>
+                        <option value="drink">เครื่องดื่ม</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">เพิ่มเมนู</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='menu.js') }}"></script>
 </body>
 </html>
