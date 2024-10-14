@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Management</title>
+    <title>ระบบจัดการคำสั่งอาหาร</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style1.css') }}">
 </head>
 <body>
@@ -14,8 +14,42 @@
         <a href="{{ url_for('total_summary') }}" class="Menu Total">สรุป</a>
     </div>
 
-    <div class="box">
-        <h2 class="Order">เมนูที่กำลังดำเนินการ <span class="Order Accet">เมนูที่รอรับ</span></h2>
+    <div class="orders-container">
+        <div class="pending-orders">
+            <h3>คำสั่งที่รอการยืนยัน</h3>
+            {% if pending_orders %}
+                {% for order in pending_orders %}
+                <div class="order-item">
+                    <p>คำสั่งที่ {{ order[0] }} - {{ order[1] }}</p>
+                    <p>รายการ: {{ order[2] }}</p>
+                    <p>ราคารวม: {{ order[3] }} บาท</p>
+                    <form action="{{ url_for('confirm_order', order_id=order[0]) }}" method="post">
+                        <button type="submit">ยืนยันคำสั่ง</button>
+                    </form>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>ไม่มีคำสั่งที่รอการยืนยัน</p>
+            {% endif %}
+        </div>
+
+        <div class="in-progress-orders">
+            <h3>คำสั่งที่กำลังดำเนินการ</h3>
+            {% if in_progress_orders %}
+                {% for order in in_progress_orders %}
+                <div class="order-item">
+                    <p>คำสั่งที่ {{ order[0] }} - {{ order[1] }}</p>
+                    <p>รายการ: {{ order[2] }}</p>
+                    <p>ราคารวม: {{ order[3] }} บาท</p>
+                    <form action="{{ url_for('complete_order', order_id=order[0]) }}" method="post">
+                        <button type="submit">เสร็จสิ้น</button>
+                    </form>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>ไม่มีคำสั่งที่กำลังดำเนินการ</p>
+            {% endif %}
+        </div>
     </div>
 </body>
 </html>
