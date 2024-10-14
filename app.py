@@ -1,8 +1,20 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
+import psycopg2
+from psycopg2 import sql
 
-template_dir = os.path.abspath('templates')
-app = Flask(__name__, template_folder=template_dir)
+app = Flask(__name__)
+
+# ฟังก์ชันสำหรับเชื่อมต่อกับฐานข้อมูล
+def get_db_connection():
+    conn = psycopg2.connect(
+        host="localhost",
+        database="postgres",
+        user="postgres",
+        password="1234",
+        options="-c search_path=food,public"
+    )
+    return conn
 
 @app.route('/')
 def index():
@@ -17,5 +29,5 @@ def total_summary():
     return render_template('Total_summary.html')
 
 if __name__ == '__main__':
-       print("Template folder:", template_dir)
+      
        app.run(debug=True)
