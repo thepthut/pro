@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style1.css') }}">
+</head>
+<body>
+    <div class="head_Top">
+        <img src="{{ url_for('static', filename='ครุศาสตร์-600x400.png') }}" alt="โลโก้" class="img1">
+        <a href="{{ url_for('index') }}" class="Menu home">หน้าหลัก</a>
+        <a href="{{ url_for('menu') }}" class="Menu food">รายการอาหาร</a>
+        <a href="{{ url_for('total_summary') }}" class="Menu Total">สรุป</a>
+    </div>
+
+    <div class="box">
+        <h2 class="Order">เมนูที่กำลังดำเนินการ <span class="Order Accet">เมนูที่รอรับ</span></h2>
+    </div>
+</body>
+</html>
