@@ -1,0 +1,70 @@
+async function submitOrder(customerName: string, items: string, totalPrice: number) {
+  try {
+    const response = await fetch('http://your-server-address/api/place_order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        customer_name: customerName,
+        items: items,
+        total_price: totalPrice
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert(`คำสั่งถูกส่งเรียบร้อยแล้ว! หมายเลขคำสั่ง: ${data.order_id}`);
+    } else {
+      alert(`เกิดข้อผิดพลาด: ${data.error}`);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('เกิดข้อผิดพลาดในการส่งคำสั่ง');
+  }
+}
+
+// ตัวอย่างการใช้งาน
+submitOrder('คุณสมชาย', 'ข้าวผัดหมู x1, น้ำเปล่า x1', 60.00);
+
+
+
+
+
+
+
+
+
+// สำหรับการทดสอบบน localhost
+const SERVER_URL = 'http://localhost:5000';
+
+// สำหรับการใช้งานจริงบนเซิร์ฟเวอร์
+// const SERVER_URL = 'https://your-restaurant-api.com';
+
+async function submitOrder(customerName: string, items: string, totalPrice: number) {
+  try {
+    const response = await fetch(`${SERVER_URL}/api/place_order`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        customer_name: customerName,
+        items: items,
+        total_price: totalPrice
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert(`คำสั่งถูกส่งเรียบร้อยแล้ว! หมายเลขคำสั่ง: ${data.order_id}`);
+    } else {
+      alert(`เกิดข้อผิดพลาด: ${data.error}`);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('เกิดข้อผิดพลาดในการส่งคำสั่ง');
+  }
+}
