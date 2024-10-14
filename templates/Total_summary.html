@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSS center</title>
+    <title>สรุปรายการ</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style1.css') }}">
 </head>
 <body>
@@ -14,6 +14,52 @@
         <a href="{{ url_for('total_summary') }}" class="Menu Total">สรุป</a>
     </div>
 
-    
+    <div class="summary-container">
+        <h2>สรุปรายได้รายวัน (7 วันล่าสุด)</h2>
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>วันที่</th>
+                    <th>รายได้รวม</th>
+                    <th>จำนวนคำสั่งซื้อ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for day, total, count in daily_summaries %}
+                <tr>
+                    <td>{{ day.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ total }} บาท</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>รายการคำสั่งซื้อล่าสุด</h2>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>รหัสคำสั่งซื้อ</th>
+                    <th>ชื่อลูกค้า</th>
+                    <th>รายการ</th>
+                    <th>ราคารวม</th>
+                    <th>เวลาสั่งซื้อ</th>
+                    <th>สถานะ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                    <td>{{ order[0] }}</td>
+                    <td>{{ order[1] }}</td>
+                    <td>{{ order[2] }}</td>
+                    <td>{{ order[3] }} บาท</td>
+                    <td>{{ order[4].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ order[5] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

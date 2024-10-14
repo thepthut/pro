@@ -2,9 +2,11 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import psycopg2
 from psycopg2 import sql
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
+
+
 
 def get_db_connection():
     conn = psycopg2.connect(
@@ -15,6 +17,9 @@ def get_db_connection():
         options="-c search_path=food,public"
     )
     return conn
+
+
+
 
 def create_orders_table(conn):
     with conn.cursor() as cur:
@@ -30,6 +35,11 @@ def create_orders_table(conn):
         """)
         conn.commit()
 
+
+
+
+
+
 def add_sample_data(conn):
     with conn.cursor() as cur:
         cur.execute("SELECT COUNT(*) FROM orders")
@@ -38,7 +48,7 @@ def add_sample_data(conn):
         if count == 0:
             sample_orders = [
                 ("คุณ A", "ข้าวผัดหมู x1, น้ำเปล่า x1", 60.00, datetime.now(), "pending"),
-                ("คุณ B", "ก๋วยเตี๋ยวต้มยำ x2", 80.00, datetime.now(), "in_progress"),
+                ("คุณ B", "ก๋วยเตี๋ยวต้มยำ x2", 80.00, datetime.now(), "in progress"),
                 ("คุณ C", "ข้าวมันไก่ x1, โค้ก x1", 70.00, datetime.now(), "pending"),
             ]
             
@@ -48,6 +58,11 @@ def add_sample_data(conn):
             """, sample_orders)
             
             conn.commit()
+
+
+
+
+
 
 @app.route('/')
 def index():
@@ -59,7 +74,7 @@ def index():
     pending_orders = cur.fetchall()
     
     # Fetch in-progress orders
-    cur.execute("SELECT * FROM orders WHERE status = 'in_progress' ORDER BY order_time")
+    cur.execute("SELECT * FROM orders WHERE status = 'in progress' ORDER BY order_time")
     in_progress_orders = cur.fetchall()
     
     cur.close()
@@ -67,20 +82,65 @@ def index():
     
     return render_template('index.html', pending_orders=pending_orders, in_progress_orders=in_progress_orders)
 
+
+
+
+
+
+
+
+
+
 @app.route('/menu')
 def menu():
     return render_template('menu.html')
 
+
+
+
+
+
+
+
+
 @app.route('/total_summary')
 def total_summary():
-    return render_template('Total_summary.html')
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Fetch orders from the last 7 days
+    seven_days_ago = datetime.now() - timedelta(days=7)
+    cur.execute("""
+        SELECT DATE(order_time), SUM(total_price), COUNT(*)
+        FROM orders
+        WHERE order_time >= %s
+        GROUP BY DATE(order_time)
+        ORDER BY DATE(order_time) DESC
+    """, (seven_days_ago,))
+    daily_summaries = cur.fetchall()
+    
+    # Fetch recent orders
+    cur.execute("""
+        SELECT id, customer_name, items, total_price, order_time, status
+        FROM orders
+        WHERE order_time >= %s
+        ORDER BY order_time DESC
+        LIMIT 50
+    """, (seven_days_ago,))
+    recent_orders = cur.fetchall()
+    
+    cur.close()
+    conn.close()
+    
+    return render_template('Total_summary.html', daily_summaries=daily_summaries, recent_orders=recent_orders)
+
 
 @app.route('/confirm_order/<int:order_id>', methods=['POST'])
 def confirm_order(order_id):
     conn = get_db_connection()
     cur = conn.cursor()
     
-    cur.execute("UPDATE orders SET status = 'in_progress' WHERE id = %s", (order_id,))
+    cur.execute("UPDATE orders SET status = 'in progress' WHERE id = %s", (order_id,))
     conn.commit()
     
     cur.close()
