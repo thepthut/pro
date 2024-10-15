@@ -1,8 +1,9 @@
-import os
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import psycopg2
 from psycopg2 import sql
 from datetime import datetime, timedelta
+
+
 
 app = Flask(__name__)
 
@@ -48,7 +49,7 @@ def add_sample_data(conn):
         if count == 0:
             sample_orders = [
                 ("คุณ A", "ข้าวผัดหมู x1, น้ำเปล่า x1", 60.00, datetime.now(), "pending"),
-                ("คุณ B", "ก๋วยเตี๋ยวต้มยำ x2", 80.00, datetime.now(), "in progress"),
+                ("คุณ B", "ก๋วยเตี๋ยวต้มยำ x2", 80.00, datetime.now(), "in_progress"),
                 ("คุณ C", "ข้าวมันไก่ x1, โค้ก x1", 70.00, datetime.now(), "pending"),
             ]
             
@@ -74,7 +75,7 @@ def index():
     pending_orders = cur.fetchall()
     
     # Fetch in-progress orders
-    cur.execute("SELECT * FROM orders WHERE status = 'in progress' ORDER BY order_time")
+    cur.execute("SELECT * FROM orders WHERE status = 'in_progress' ORDER BY order_time")
     in_progress_orders = cur.fetchall()
     
     cur.close()
@@ -90,12 +91,28 @@ def index():
 
 
 
-
 @app.route('/menu')
 def menu():
-    return render_template('menu.html')
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM menu_items ORDER BY id DESC')
+    menu_items = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('menu.html', menu_items=menu_items)
 
-
+@app.route('/add_menu_item', methods=['POST'])
+def add_menu_item():
+    data = request.json
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('INSERT INTO menu_items (name, price, description, category) VALUES (%s, %s, %s, %s) RETURNING id',
+                (data['name'], data['price'], data['description'], data['category']))
+    new_id = cur.fetchone()[0]
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"success": True, "id": new_id}), 201
 
 
 
@@ -140,7 +157,7 @@ def confirm_order(order_id):
     conn = get_db_connection()
     cur = conn.cursor()
     
-    cur.execute("UPDATE orders SET status = 'in progress' WHERE id = %s", (order_id,))
+    cur.execute("UPDATE orders SET status = 'in_progress' WHERE id = %s", (order_id,))
     conn.commit()
     
     cur.close()

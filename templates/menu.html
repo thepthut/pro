@@ -19,7 +19,14 @@
         <button id="add-menu-btn" class="add-menu-btn">เพิ่มเมนูใหม่</button>
         
         <div id="menu-list">
-            <!-- รายการเมนูอาหารจะถูกเพิ่มที่นี่ด้วย TypeScript -->
+            {% for item in menu_items %}
+            <div class="menu-item">
+                <h4>{{ item[1] }}</h4>
+                <p>ราคา: {{ item[2] }} บาท</p>
+                <p>คำอธิบาย: {{ item[3] }}</p>
+                <p>หมวดหมู่: {{ item[4] }}</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 
@@ -55,6 +62,73 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='menu.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var addMenuBtn = document.getElementById('add-menu-btn');
+            var modal = document.getElementById('add-menu-modal');
+            var closeBtn = modal.querySelector('.close');
+            var form = document.getElementById('add-menu-form');
+            var menuList = document.getElementById('menu-list');
+
+            addMenuBtn.onclick = function() {
+                modal.style.display = 'block';
+            }
+
+            closeBtn.onclick = function() {
+                modal.style.display = 'none';
+            }
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                var formData = new FormData(form);
+                var menuItem = {
+                    name: formData.get('menu-name'),
+                    price: parseFloat(formData.get('menu-price')),
+                    description: formData.get('menu-description'),
+                    category: formData.get('menu-category')
+                };
+                
+                fetch('/add_menu_item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(menuItem)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        addMenuItem(menuItem);
+                        modal.style.display = 'none';
+                        form.reset();
+                    } else {
+                        alert('เกิดข้อผิดพลาดในการเพิ่มเมนู');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('เกิดข้อผิดพลาดในการเพิ่มเมนู');
+                });
+            }
+
+            function addMenuItem(item) {
+                var newMenuItem = document.createElement('div');
+                newMenuItem.className = 'menu-item';
+                newMenuItem.innerHTML = `
+                    <h4>${item.name}</h4>
+                    <p>ราคา: ${item.price} บาท</p>
+                    <p>คำอธิบาย: ${item.description}</p>
+                    <p>หมวดหมู่: ${item.category}</p>
+                `;
+                menuList.insertBefore(newMenuItem, menuList.firstChild);
+            }
+        });
+    </script>
 </body>
 </html>
